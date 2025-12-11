@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Last Resort – Search Tools</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  </head>
+  <body>
+    <video autoplay muted loop playsinline class="background-video">
+    <source src="{{ url_for('static', filename='videos/ocean.mp4') }}" type="video/mp4">
+  </video>
+    <div class="page">
+      <main class="search-page">
+        <h1>Search Tools</h1>
+        <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+        <p class="search-intro">Run focused queries on guests, hotels, and staff.</p>
+
+        <!-- Guest search -->
+        <section class="search-section">
+          <h2>Guest Search – Reservations &amp; Revenue</h2>
+          <form method="get" action="{{ url_for('search') }}" class="search-form">
+            <input type="hidden" name="type" value="guest">
+            <label for="guest_q">Guest name:</label>
+            <input id="guest_q" type="text" name="q"
+                   placeholder="e.g. Sarah Johnson"
+                   value="{{ q if search_type == 'guest' else '' }}">
+            <button type="submit">Search</button>
+          </form>
+
+          {% if search_type == 'guest' and q %}
+            <h3>Results for "{{ q }}"</h3>
+            {% if results|length == 0 %}
+              <p>No reservations found.</p>
+            {% else %}
+              <table>
+                <thead>
+                  <tr>
+                    <th>Reservation ID</th>
+                    <th>Guest</th>
+                    <th>Email</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Total Revenue</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in results %}
+                  <tr>
+                    <td>{{ row["reservationId"] }}</td>
+                    <td>{{ row["customer_name"] }}</td>
+                    <td>{{ row["email"] }}</td>
+                    <td>{{ row["check_in"] or "—" }}</td>
+                    <td>{{ row["check_out"] or "—" }}</td>
+                    <td>${{ "%.2f"|format(row["total_revenue"] or 0) }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% endif %}
+          {% endif %}
+        </section>
+
+        <!-- Hotel search -->
+        <section class="search-section">
+          <h2>Hotel Search – Monthly Revenue</h2>
+          <form method="get" action="{{ url_for('search') }}" class="search-form">
+            <input type="hidden" name="type" value="hotel">
+            <label for="hotel_q">Hotel name:</label>
+            <input id="hotel_q" type="text" name="q"
+                   placeholder="e.g. Cancun"
+                   value="{{ q if search_type == 'hotel' else '' }}">
+            <button type="submit">Search</button>
+          </form>
+
+          {% if search_type == 'hotel' and q %}
+            <h3>Results for "{{ q }}"</h3>
+            {% if results|length == 0 %}
+              <p>No matching hotel revenue found.</p>
+            {% else %}
+              <table>
+                <thead>
+                  <tr>
+                    <th>Hotel</th>
+                    <th>Year-Month</th>
+                    <th>Total Revenue</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in results %}
+                  <tr>
+                    <td>{{ row["hotel_name"] }}</td>
+                    <td>{{ row["year_month"] }}</td>
+                    <td>${{ "%.2f"|format(row["total_revenue"] or 0) }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% endif %}
+          {% endif %}
+        </section>
+
+        <!-- Staff search -->
+        <section class="search-section">
+          <h2>Staff Search – Tasks &amp; Events</h2>
+          <form method="get" action="{{ url_for('search') }}" class="search-form">
+            <input type="hidden" name="type" value="staff">
+            <label for="staff_q">Staff name:</label>
+            <input id="staff_q" type="text" name="q"
+                   placeholder="e.g. Maria Lopez"
+                   value="{{ q if search_type == 'staff' else '' }}">
+            <button type="submit">Search</button>
+          </form>
+
+          {% if search_type == 'staff' and q %}
+            <h3>Results for "{{ q }}"</h3>
+            {% if results|length == 0 %}
+              <p>No staff found.</p>
+            {% else %}
+              <table>
+                <thead>
+                  <tr>
+                    <th>Staff</th>
+                    <th>Role</th>
+                    <th># Tasks</th>
+                    <th># Events Supported</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in results %}
+                  <tr>
+                    <td>{{ row["staff_name"] }}</td>
+                    <td>{{ row["occupation"] }}</td>
+                    <td>{{ row["num_tasks"] }}</td>
+                    <td>{{ row["num_events_supported"] }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% endif %}
+          {% endif %}
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
+
+

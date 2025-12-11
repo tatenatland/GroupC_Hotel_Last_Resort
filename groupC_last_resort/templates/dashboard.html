@@ -1,0 +1,248 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Last Resort Hotels – Analytics Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  </head>
+  <body>
+    <video autoplay muted loop playsinline class="background-video">
+    <source src="{{ url_for('static', filename='videos/ocean.mp4') }}" type="video/mp4">
+  </video>
+    <div class="page">
+
+      <!-- TOP NAV / BRAND -->
+      <header class="site-header">
+        <div class="logo">Last Resort Hotels</div>
+        <nav class="nav">
+          <a href="{{ url_for('dashboard') }}" class="nav-link nav-link-active">Dashboard</a>
+          <a href="{{ url_for('search') }}" class="nav-link">Search Tools</a>
+        </nav>
+      </header>
+
+      <!-- HERO BANNER -->
+      <!-- Put a nice photo as static/banner.jpg -->
+      <section class="hero"
+               style="background-image: url('{{ url_for('static', filename='images/banner3.jpg') }}');">
+        <div class="hero-overlay">
+          <h1>Analytics Dashboard</h1>
+          <p>Track revenue, occupancy, and guest value across the Last Resort Hotels portfolio.</p>
+        </div>
+      </section>
+
+      <!-- MAIN DASHBOARD CONTENT -->
+      <main class="dashboard">
+        <h2 class="dashboard-title">Key Business Metrics</h2>
+
+        <div class="grid">
+          <!-- 1. Monthly Revenue Trend -->
+          <section class="card full">
+            <h2>1. Monthly Revenue Trend (Overall)</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Month</th>
+                  <th>Total Revenue</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in monthly_revenue %}
+                <tr>
+                  <td>{{ row["revenue_year"] }}</td>
+                  <td>{{ row["revenue_month"] }}</td>
+                  <td>${{ "%.2f"|format(row["total_revenue"] or 0) }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 2. Revenue by Hotel -->
+          <section class="card half">
+            <h2>2. Revenue by Hotel</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Hotel</th>
+                  <th>Total Revenue</th>
+                  <th># Reservations</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in revenue_by_hotel %}
+                <tr>
+                  <td>{{ row["hotel_name"] }}</td>
+                  <td>${{ "%.2f"|format(row["total_revenue"] or 0) }}</td>
+                  <td>{{ row["num_reservations"] }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 3. Top Customers -->
+          <section class="card half">
+            <h2>3. Top 10 Customers by Revenue</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Total Revenue</th>
+                  <th># Reservations</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in top_customers %}
+                <tr>
+                  <td>{{ row["firstName"] }} {{ row["lastName"] }}</td>
+                  <td>${{ "%.2f"|format(row["total_revenue"] or 0) }}</td>
+                  <td>{{ row["num_reservations"] }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 4. Revenue by Charge Type -->
+          <section class="card half">
+            <h2>4. Revenue by Charge Type</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Charge Type</th>
+                  <th>Total Revenue</th>
+                  <th># Charges</th>
+                  <th>Avg Charge</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in revenue_by_charge_type %}
+                <tr>
+                  <td>{{ row["charge_type"] }}</td>
+                  <td>${{ "%.2f"|format(row["total_revenue"] or 0) }}</td>
+                  <td>{{ row["num_charges"] }}</td>
+                  <td>${{ "%.2f"|format(row["avg_charge_amount"] or 0) }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 5. Room Type Performance -->
+          <section class="card half">
+            <h2>5. Room Type Performance</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Room Type</th>
+                  <th># Stays</th>
+                  <th>Total Revenue</th>
+                  <th>Avg Revenue per Stay</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in room_type_perf %}
+                <tr>
+                  <td>{{ row["room_type"] }}</td>
+                  <td>{{ row["num_stays"] }}</td>
+                  <td>${{ "%.2f"|format(row["total_revenue"] or 0) }}</td>
+                  <td>${{ "%.2f"|format(row["avg_revenue_per_stay"] or 0) }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 6. Occupancy by Hotel -->
+          <section class="card half">
+            <h2>6. Approx. Occupancy (Stays per Room, Jan–Mar 2025)</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Hotel</th>
+                  <th># Stays</th>
+                  <th># Rooms</th>
+                  <th>Stays per Room</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in occupancy_by_hotel %}
+                <tr>
+                  <td>{{ row["hotel_name"] }}</td>
+                  <td>{{ row["num_stays"] }}</td>
+                  <td>{{ row["total_rooms"] }}</td>
+                  <td>{{ "%.2f"|format(row["stays_per_room_ratio"] or 0) }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 7. Customer Value vs Qualification Score -->
+          <section class="card half">
+            <h2>7. Customer Value vs Qualification Score</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Qualification Score</th>
+                  <th># Customers</th>
+                  <th>Total Revenue</th>
+                  <th>Avg Revenue per Customer</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in value_vs_score %}
+                <tr>
+                  <td>{{ row["qualification_score"] }}</td>
+                  <td>{{ row["num_customers"] }}</td>
+                  <td>${{ "%.2f"|format(row["total_revenue"] or 0) }}</td>
+                  <td>${{ "%.2f"|format(row["avg_revenue_per_customer"] or 0) }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 8. Staff Workload -->
+          <section class="card half">
+            <h2>8. Staff Workload</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Staff</th>
+                  <th>Role</th>
+                  <th># Tasks</th>
+                  <th># Events Supported</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in staff_workload %}
+                <tr>
+                  <td>{{ row["firstName"] }} {{ row["lastName"] }}</td>
+                  <td>{{ row["occupation"] }}</td>
+                  <td>{{ row["num_tasks"] }}</td>
+                  <td>{{ row["num_events_supported"] }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </section>
+
+        </div>
+      </main>
+
+      <footer class="site-footer">
+        Last Resort Hotels – Course Project
+      </footer>
+
+    </div>
+  </body>
+</html>
+
